@@ -35,7 +35,7 @@ async function showAuth(){
 async function fetchTasks(){ const { data, error } = await sb.from('tasks').select('*').order('created_at',{ascending:false}); if(error) { console.error(error); return []; } return data || []; }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-async function render(){ const tasks = await fetchTasks(); const list = document.getElementById('taskList'); list.innerHTML=''; if(!tasks.length) return list.innerHTML='<div class="small-muted">No tasks</div>';
+async function render(){ const tasks = await fetchTasks(); console.log('render: fetched tasks', tasks?tasks.length:0); const list = document.getElementById('taskList'); list.innerHTML=''; if(!tasks.length) return list.innerHTML='<div class="small-muted">No tasks</div>';
   for(const t of tasks){ const el=document.createElement('div'); el.className='task-card'; // use CSS for spacing
     const shortNotes = t.notes ? (t.notes.length>80? escapeHtml(t.notes.slice(0,80)) + '…' : escapeHtml(t.notes)) : '';
     el.innerHTML = `
