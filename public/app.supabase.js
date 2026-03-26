@@ -48,8 +48,21 @@ function renderSidebar(tasks){ const bucketList = document.getElementById('bucke
 
 async function render(){ const tasks = await fetchTasks(); console.log('render: fetched tasks', tasks?tasks.length:0); renderSidebar(tasks); const list = document.getElementById('taskList'); list.innerHTML=''; if(!tasks.length) return list.innerHTML='<div class="small-muted">No tasks</div>';
   // render active tasks first
-  const activeTasks = tasks.filter(t => (t.status||'').toLowerCase() !== 'completed');
   const completedTasks = tasks.filter(t => (t.status||'').toLowerCase() === 'completed');
+  let activeTasks = tasks.filter(t => (t.status||'').toLowerCase() !== 'completed');
+  // apply bucket filter
+  if(selectedBucket==='Today'){
+    activeTasks = activeTasks.filter(t => isTodayStr(t.due) || (!t.due));
+  } else if(selectedBucket==='Tomorrow'){
+    activeTasks = activeTasks.filter(t=> isTomorrowStr(t.due));
+  } else if(selectedBucket==='This Week'){
+    activeTasks = activeTasks.filter(t=> isThisWeekStr(t.due));
+  } else if(selectedBucket==='On Ice'){
+    activeTasks = activeTasks.filter(t=> (t.status||'').toLowerCase()==='on ice');
+  } else if(selectedBucket==='Completed'){
+    // show no active tasks in main list for Completed bucket
+    activeTasks = [];
+  }
   if(activeTasks.length === 0 && completedTasks.length === 0) return list.innerHTML = '<div class="small-muted">No tasks</div>';
   for(const t of activeTasks){ const el=document.createElement('div'); el.className='task-card'; // use CSS for spacing
     const shortNotes = t.notes ? (t.notes.length>80? escapeHtml(t.notes.slice(0,80)) + '…' : escapeHtml(t.notes)) : '';
