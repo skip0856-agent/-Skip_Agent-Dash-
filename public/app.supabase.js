@@ -36,7 +36,11 @@ async function fetchTasks(){ const { data, error } = await sb.from('tasks').sele
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 async function render(){ const tasks = await fetchTasks(); console.log('render: fetched tasks', tasks?tasks.length:0); const list = document.getElementById('taskList'); list.innerHTML=''; if(!tasks.length) return list.innerHTML='<div class="small-muted">No tasks</div>';
-  for(const t of tasks){ const el=document.createElement('div'); el.className='task-card'; // use CSS for spacing
+  // render active tasks first
+  const activeTasks = tasks.filter(t => (t.status||'').toLowerCase() !== 'completed');
+  const completedTasks = tasks.filter(t => (t.status||'').toLowerCase() === 'completed');
+  if(activeTasks.length === 0 && completedTasks.length === 0) return list.innerHTML = '<div class="small-muted">No tasks</div>';
+  for(const t of activeTasks){ const el=document.createElement('div'); el.className='task-card'; // use CSS for spacing
     const shortNotes = t.notes ? (t.notes.length>80? escapeHtml(t.notes.slice(0,80)) + '…' : escapeHtml(t.notes)) : '';
     el.innerHTML = `
       <div style="flex:1;min-width:0">
@@ -100,6 +104,26 @@ async function render(){ const tasks = await fetchTasks(); console.log('render: 
         try{ await updateTask(saveBtn.dataset.id, payload); editor.style.display='none'; await render(); } catch(e){ alert('Save failed: '+(e.message||e)); }
     }); }
     list.appendChild(el);
+  }
+  // completed items
+  if(completedTasks.length>0){ const hdr = document.createElement('div'); hdr.className='section-header'; hdr.innerText='Completed'; hdr.style.marginTop='18px'; list.appendChild(hdr);
+    for(const t of completedTasks){ const el=document.createElement('div'); el.className='task-card completed';
+      const shortNotes = t.notes ? (t.notes.length>80? escapeHtml(t.notes.slice(0,80)) + '…' : escapeHtml(t.notes)) : '';
+      el.innerHTML = `
+        <div style="flex:1;min-width:0;opacity:0.7">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-weight:700;text-decoration:line-through">${escapeHtml(t.title)}</div>
+            <div style="font-size:12px;color:var(--muted)">${escapeHtml(t.bucket||'Work')}</div>
+          </div>
+          <div class="small-muted" style="font-size:13px;margin-top:6px">${escapeHtml(t.status||'Completed')} • Due: ${escapeHtml(t.due||'—')}</div>
+          ${ shortNotes ? `<div style="margin-top:8px;color:var(--muted);font-size:13px">${shortNotes}</div>` : '' }
+        </div>
+        <div style="margin-left:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <button class="action-btn" data-action="move" data-id="${t.id}">Move</button>
+        </div>`;
+      const moveBtn = el.querySelector('[data-action="move"]'); if(moveBtn){ moveBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const newStatus = prompt('Change status', 'Active'); if(newStatus) { await updateTask(newStatus); render(); } }); }
+      list.appendChild(el);
+    }
   }
 }
 
