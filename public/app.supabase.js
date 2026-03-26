@@ -35,7 +35,18 @@ async function showAuth(){
 async function fetchTasks(){ const { data, error } = await sb.from('tasks').select('*').order('created_at',{ascending:false}); if(error) { console.error(error); return []; } return data || []; }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-async function render(){ const tasks = await fetchTasks(); console.log('render: fetched tasks', tasks?tasks.length:0); const list = document.getElementById('taskList'); list.innerHTML=''; if(!tasks.length) return list.innerHTML='<div class="small-muted">No tasks</div>';
+let selectedBucket = 'Today';
+function isTodayStr(d){ if(!d) return false; const dt=new Date(d); const now=new Date(); return dt.getFullYear()===now.getFullYear() && dt.getMonth()===now.getMonth() && dt.getDate()===now.getDate(); }
+function isTomorrowStr(d){ if(!d) return false; const dt=new Date(d); const t=new Date(); t.setDate(t.getDate()+1); return dt.getFullYear()===t.getFullYear() && dt.getMonth()===t.getMonth() && dt.getDate()===t.getDate(); }
+function isThisWeekStr(d){ if(!d) return false; const dt=new Date(d); const now=new Date(); const start = new Date(now); start.setDate(now.getDate() - now.getDay()); start.setHours(0,0,0,0); const end = new Date(start); end.setDate(start.getDate()+7); return dt >= start && dt < end; }
+
+function renderSidebar(tasks){ const bucketList = document.getElementById('bucketList'); const today = tasks.filter(t=> isTodayStr(t.due) || (!t.due && (t.status||'').toLowerCase() !== 'completed')).length; const tomorrow = tasks.filter(t=> isTomorrowStr(t.due)).length; const week = tasks.filter(t=> isThisWeekStr(t.due)).length; const onIce = tasks.filter(t=> ((t.status||'').toLowerCase()==='on ice')).length; const completed = tasks.filter(t=> ((t.status||'').toLowerCase()==='completed')).length;
+  bucketList.innerHTML = '';
+  const buckets = [ ['Today', today], ['Tomorrow', tomorrow], ['This Week', week], ['On Ice', onIce], ['Completed', completed] ];
+  for(const b of buckets){ const btn = document.createElement('div'); btn.className='chip'; btn.style.cursor='pointer'; btn.style.display='flex'; btn.style.justifyContent='space-between'; btn.style.padding='8px'; btn.style.marginBottom='8px'; btn.dataset.bucket = b[0]; btn.innerHTML = `<div>${b[0]}</div><div style="opacity:0.8">${b[1]}</div>`; if(b[0]===selectedBucket) btn.style.boxShadow='inset 0 0 0 2px rgba(96,165,250,0.14)'; btn.addEventListener('click', ()=>{ selectedBucket = b[0]; document.getElementById('mainTitle').innerText = selectedBucket; render(); }); bucketList.appendChild(btn); }
+}
+
+async function render(){ const tasks = await fetchTasks(); console.log('render: fetched tasks', tasks?tasks.length:0); renderSidebar(tasks); const list = document.getElementById('taskList'); list.innerHTML=''; if(!tasks.length) return list.innerHTML='<div class="small-muted">No tasks</div>';
   // render active tasks first
   const activeTasks = tasks.filter(t => (t.status||'').toLowerCase() !== 'completed');
   const completedTasks = tasks.filter(t => (t.status||'').toLowerCase() === 'completed');
