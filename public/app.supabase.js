@@ -48,6 +48,13 @@ async function render(){ const tasks = await fetchTasks(); console.log('render: 
         <div class="card-actions"><button class="action-btn" data-action="note" data-id="${t.id}">Note</button> <button class="action-btn" data-action="move" data-id="${t.id}">Move</button></div>
         <button class="action-btn primary" data-action="done" data-id="${t.id}">Done</button>
       </div>`;
+    // Attach direct handlers so clicks reliably fire
+    const doneBtn = el.querySelector('[data-action="done"]');
+    const noteBtn = el.querySelector('[data-action="note"]');
+    const moveBtn = el.querySelector('[data-action="move"]');
+    if(doneBtn){ doneBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); await updateTask(doneBtn.dataset.id,{status:'Completed',progress:100}); render(); }); }
+    if(noteBtn){ noteBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const note = prompt('Add / edit note'); if(note !== null){ await updateTask(noteBtn.dataset.id,{notes:note}); render(); } }); }
+    if(moveBtn){ moveBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const newStatus = prompt('Change status (Active / Blocked / On Ice / Future Ideas / Completed)', 'Active'); if(newStatus){ await updateTask(moveBtn.dataset.id,{status:newStatus}); render(); } }); }
     list.appendChild(el);
   }
 }
