@@ -52,5 +52,3 @@ async function initApp(){ const user = sb.auth.getUser(); document.getElementByI
 showAuth();
 // If already signed in (rare), initialize
 sb.auth.onAuthStateChange((event, session)=>{ if(session && session.user) initApp(); });
-
-```
