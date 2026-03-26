@@ -46,7 +46,13 @@ function wireActions(){ document.getElementById('addTop').addEventListener('clic
  });
 }
 
-async function initApp(){ const user = sb.auth.getUser(); document.getElementById('authArea').style.display='none'; document.getElementById('appArea').style.display='block'; wireActions(); await render(); }
+async function initApp(){ const ud = await sb.auth.getUser(); const user = ud && ud.data && ud.data.user ? ud.data.user : null; if(!user){ // no signed-in user, show auth UI
+  document.getElementById('authArea').style.display='block';
+  document.getElementById('appArea').style.display='none';
+  showAuth();
+  return;
+}
+  document.getElementById('authArea').style.display='none'; document.getElementById('appArea').style.display='block'; wireActions(); await render(); }
 
 // startup
 showAuth();
