@@ -40,12 +40,42 @@ async function render(){ const tasks = await fetchTasks(); console.log('render: 
     const shortNotes = t.notes ? (t.notes.length>80? escapeHtml(t.notes.slice(0,80)) + '…' : escapeHtml(t.notes)) : '';
     el.innerHTML = `
       <div style="flex:1;min-width:0">
-        <div style="font-weight:700">${escapeHtml(t.title)}</div>
-        <div class="small-muted" style="font-size:13px;margin-top:6px">${escapeHtml(t.bucket||'Work')} • ${escapeHtml(t.status||'Not Started')} • Due: ${escapeHtml(t.due||'—')}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-weight:700">${escapeHtml(t.title)}</div>
+          <div style="font-size:12px;color:var(--muted)">${escapeHtml(t.bucket||'Work')}</div>
+        </div>
+        <div class="small-muted" style="font-size:13px;margin-top:6px">${escapeHtml(t.status||'Not Started')} • Due: ${escapeHtml(t.due||'—')}</div>
         ${ shortNotes ? `<div style="margin-top:8px;color:var(--muted);font-size:13px">${shortNotes}</div>` : '' }
+        <!-- inline editor (hidden by default) -->
+        <div class="inline-editor" style="display:none;margin-top:8px;padding:8px;border-top:1px dashed rgba(0,0,0,0.04)">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input class="edit-title" style="flex:1;padding:6px;border-radius:6px;border:1px solid #e6eef6" value="${escapeHtml(t.title)}">
+            <select class="edit-bucket" style="padding:6px;border-radius:6px;border:1px solid #e6eef6">
+              <option ${t.bucket==='Work'?'selected':''}>Work</option>
+              <option ${t.bucket==='Personal'?'selected':''}>Personal</option>
+              <option ${t.bucket==='Family'?'selected':''}>Family</option>
+              <option ${t.bucket==='Long-Term'?'selected':''}>Long-Term</option>
+            </select>
+            <select class="edit-status" style="padding:6px;border-radius:6px;border:1px solid #e6eef6">
+              <option ${t.status==='Not Started'?'selected':''}>Not Started</option>
+              <option ${t.status==='Active'?'selected':''}>Active</option>
+              <option ${t.status==='Blocked'?'selected':''}>Blocked</option>
+              <option ${t.status==='On Ice'?'selected':''}>On Ice</option>
+              <option ${t.status==='Future Ideas'?'selected':''}>Future Ideas</option>
+              <option ${t.status==='Completed'?'selected':''}>Completed</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input type="date" class="edit-due" value="${t.due||''}" style="padding:6px;border-radius:6px;border:1px solid #e6eef6">
+            <input type="number" min="0" max="100" class="edit-progress" value="${t.progress||0}" style="width:110px;padding:6px;border-radius:6px;border:1px solid #e6eef6">
+            <input class="edit-blocker" placeholder="Blocker" value="${escapeHtml(t.blocker||'')}" style="flex:1;padding:6px;border-radius:6px;border:1px solid #e6eef6">
+          </div>
+          <div style="margin-top:8px"><textarea class="edit-notes" rows=3 style="width:100%;padding:6px;border-radius:6px;border:1px solid #e6eef6">${escapeHtml(t.notes||'')}</textarea></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="action-btn save" data-id="${t.id}">Save</button><button class="action-btn cancel">Cancel</button></div>
+        </div>
       </div>
       <div style="margin-left:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <div class="card-actions"><button class="action-btn" data-action="note" data-id="${t.id}">Note</button> <button class="action-btn" data-action="move" data-id="${t.id}">Move</button></div>
+        <div class="card-actions"><button class="action-btn" data-action="note" data-id="${t.id}">Edit</button> <button class="action-btn" data-action="move" data-id="${t.id}">Move</button></div>
         <button class="action-btn primary" data-action="done" data-id="${t.id}">Done</button>
       </div>`;
     // Attach direct handlers so clicks reliably fire
