@@ -5,7 +5,22 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Detail Direct — Dashboard (Preview)</title>
 <link rel="manifest" href="/manifest.json">
-<style>body{font-family:Inter,Segoe UI,Arial;background:#f6f9fb;color:#0b2545;margin:0;padding:18px} .container{max-width:1100px;margin:0 auto} h1{font-size:20px} .small-muted{color:#6b7280}</style>
+<style>
+:root{--bg:#f6f9fb;--card:#ffffff;--muted:#6b7280;--text:#0b2545;--accent:#2563eb;--surface:#f8fafc}
+body{font-family:Inter,Segoe UI,Arial;background:var(--bg);color:var(--text);margin:0;padding:18px}
+.container{max-width:1100px;margin:0 auto}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:20px;margin:0}
+.small-muted{color:var(--muted)}
+.header-actions{display:flex;gap:8px}
+.btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(11,37,69,0.06)}
+.card{background:var(--card);border-radius:12px;padding:12px;border:1px solid rgba(11,37,69,0.06);box-shadow:0 6px 18px rgba(11,37,69,0.04)}
+.task-card{background:var(--card);border-radius:10px;padding:14px;border:1px solid #eef8fb;box-shadow:0 6px 18px rgba(11,37,69,0.04);display:flex;justify-content:space-between;align-items:flex-start}
+.chip{background:var(--surface);color:var(--text);padding:6px 10px;border-radius:999px;font-size:12px}
+/* dark theme */
+.dark{--bg:#0b1220;--card:#0e1624;--muted:#9aa7b2;--text:#dbeafe;--accent:#60a5fa;--surface:#11202b}
+</style>
 <!-- Supabase JS (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -17,14 +32,30 @@
 </head>
 <body>
 <div class="container">
-  <h1>Detail Direct — Dashboard (Preview)</h1>
-  <p class="small-muted">This is the private dashboard preview. You will sign in to see tasks.</p>
+  <div class="toprow">
+    <div>
+      <h1>Skip Dashboard</h1>
+      <div class="small-muted">Clean command view for tasks, priorities, and shared project progress.</div>
+    </div>
+    <div class="header-actions">
+      <input id="search" placeholder="Search tasks, projects, people, notes..." style="padding:8px;border-radius:8px;border:1px solid rgba(11,37,69,0.06)">
+      <button id="themeToggle" class="btn ghost">Dark</button>
+      <button id="addTop" class="btn">+ Add Task</button>
+    </div>
+  </div>
+
+  <p style="margin-top:10px" class="small-muted">Clean command view for tasks, priorities, and shared project progress.</p>
   <div id="authArea"></div>
   <div id="appArea" style="display:none">
-    <div style="margin-top:12px"><button id="addTop">Add Task</button></div>
-    <h3 id="mainTitle" style="margin-top:12px">Today</h3>
-    <div id="taskList">Loading...</div>
+    <div style="margin-top:12px" class="card"><strong id="mainTitle">Today</strong></div>
+    <div style="margin-top:12px" id="taskList">Loading...</div>
   </div>
+
+<script>
+// theme toggle
+(function(){ const btn=document.getElementById('themeToggle'); const root=document.documentElement; const stored=localStorage.getItem('theme'); if(stored==='dark'){ root.classList.add('dark'); btn.textContent='Light'; }
+ btn.addEventListener('click', ()=>{ if(root.classList.toggle('dark')){ btn.textContent='Light'; localStorage.setItem('theme','dark')} else { btn.textContent='Dark'; localStorage.setItem('theme','light') } });})();
+</script>
 </div>
 <script src="/app.supabase.js"></script>
 </body>
