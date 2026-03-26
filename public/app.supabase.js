@@ -59,7 +59,15 @@ function wireActions(){ document.getElementById('addTop').addEventListener('clic
   const title = prompt('Task title'); if(!title) return; addTask({title,bucket:'Work',status:'Not Started',progress:0}).then(()=>render());
 });
  document.getElementById('taskList').addEventListener('click', async (ev)=>{
-   const btn = ev.target.closest('button'); if(!btn) return; const id = btn.dataset.id; if(btn.classList.contains('done')){ await updateTask(id,{status:'Completed',progress:100}); render(); } if(btn.classList.contains('edit')){ const newTitle = prompt('Edit title'); if(newTitle) { await updateTask(id,{title:newTitle}); render(); } }
+   const btn = ev.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+   if(action === 'done'){
+     await updateTask(id,{status:'Completed',progress:100}); render();
+   } else if(action === 'note'){
+     const note = prompt('Add / edit note'); if(note !== null){ await updateTask(id,{notes:note}); render(); }
+   } else if(action === 'move'){
+     // open quick status chooser
+     const newStatus = prompt('Change status (Active / Blocked / On Ice / Future Ideas / Completed)', 'Active'); if(newStatus){ await updateTask(id,{status:newStatus}); render(); }
+   }
  });
 }
 
