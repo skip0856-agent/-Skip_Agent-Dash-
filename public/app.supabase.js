@@ -12,17 +12,23 @@ async function showAuth(){
       <span class="small-muted" style="margin-left:12px">(use simple test account)</span>
     </div>`;
 
+  const signinBtn = document.getElementById('signin');
+  const signupBtn = document.getElementById('signup');
   document.getElementById('signin').addEventListener('click', async ()=>{
+    signinBtn.disabled = true;
     const e=document.getElementById('email').value; const p=document.getElementById('pw').value;
     const { data, error } = await sb.auth.signInWithPassword({ email: e, password: p });
-    if(error) return alert('Sign-in failed: '+error.message);
+    if(error){ alert('Sign-in failed: '+error.message); signinBtn.disabled = false; return; }
     initApp();
   });
   document.getElementById('signup').addEventListener('click', async ()=>{
+    signupBtn.disabled = true;
     const e=document.getElementById('email').value; const p=document.getElementById('pw').value;
     const { data, error } = await sb.auth.signUp({ email: e, password: p });
-    if(error) return alert('Sign-up failed: '+error.message);
+    if(error){ alert('Sign-up failed: '+error.message); // re-enable after 60s to prevent immediate re-tries
+      setTimeout(()=>{ signupBtn.disabled=false; }, 60000); return; }
     alert('Sign-up OK — check email if verification required. Then sign in.');
+    setTimeout(()=>{ signupBtn.disabled=false; }, 60000);
   });
 }
 
