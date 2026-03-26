@@ -30,7 +30,18 @@ async function fetchTasks(){ const { data, error } = await sb.from('tasks').sele
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 async function render(){ const tasks = await fetchTasks(); const list = document.getElementById('taskList'); list.innerHTML=''; if(!tasks.length) return list.innerHTML='<div class="small-muted">No tasks</div>';
-  for(const t of tasks){ const el=document.createElement('div'); el.style.border='1px solid #e9f3f8'; el.style.padding='10px'; el.style.margin='8px 0'; el.innerHTML = `<div style="font-weight:700">${escapeHtml(t.title)}</div><div class="small-muted">${escapeHtml(t.bucket||'Work')} • ${escapeHtml(t.status||'Not Started')} • Due: ${escapeHtml(t.due||'—')}</div><div style="margin-top:6px"><button data-id="${t.id}" class="edit">Edit</button> <button data-id="${t.id}" class="done">Done</button></div>`;
+  for(const t of tasks){ const el=document.createElement('div'); el.className='task-card'; // use CSS for spacing
+    const shortNotes = t.notes ? (t.notes.length>80? escapeHtml(t.notes.slice(0,80)) + '…' : escapeHtml(t.notes)) : '';
+    el.innerHTML = `
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700">${escapeHtml(t.title)}</div>
+        <div class="small-muted" style="font-size:13px;margin-top:6px">${escapeHtml(t.bucket||'Work')} • ${escapeHtml(t.status||'Not Started')} • Due: ${escapeHtml(t.due||'—')}</div>
+        ${ shortNotes ? `<div style="margin-top:8px;color:var(--muted);font-size:13px">${shortNotes}</div>` : '' }
+      </div>
+      <div style="margin-left:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <div class="card-actions"><button class="action-btn" data-action="note" data-id="${t.id}">Note</button> <button class="action-btn" data-action="move" data-id="${t.id}">Move</button></div>
+        <button class="action-btn primary" data-action="done" data-id="${t.id}">Done</button>
+      </div>`;
     list.appendChild(el);
   }
 }
