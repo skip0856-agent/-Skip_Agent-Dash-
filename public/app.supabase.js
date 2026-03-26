@@ -83,8 +83,22 @@ async function render(){ const tasks = await fetchTasks(); console.log('render: 
     const noteBtn = el.querySelector('[data-action="note"]');
     const moveBtn = el.querySelector('[data-action="move"]');
     if(doneBtn){ doneBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); await updateTask(doneBtn.dataset.id,{status:'Completed',progress:100}); render(); }); }
-    if(noteBtn){ noteBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const note = prompt('Add / edit note'); if(note !== null){ await updateTask(noteBtn.dataset.id,{notes:note}); render(); } }); }
-    if(moveBtn){ moveBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const newStatus = prompt('Change status (Active / Blocked / On Ice / Future Ideas / Completed)', 'Active'); if(newStatus){ await updateTask(moveBtn.dataset.id,{status:newStatus}); render(); } }); }
+    if(noteBtn){ noteBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); const editor = el.querySelector('.inline-editor'); if(!editor) return; editor.style.display='block'; const ta = editor.querySelector('.edit-notes'); ta.focus(); }); }
+    if(moveBtn){ moveBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); const editor = el.querySelector('.inline-editor'); if(!editor) return; editor.style.display='block'; const st = editor.querySelector('.edit-status'); st.focus(); }); }
+    // editor buttons (save/cancel)
+    const saveBtn = el.querySelector('.inline-editor .save');
+    const cancelBtn = el.querySelector('.inline-editor .cancel');
+    if(cancelBtn){ cancelBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); const editor = el.querySelector('.inline-editor'); if(editor) editor.style.display='none'; }); }
+    if(saveBtn){ saveBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const editor = el.querySelector('.inline-editor'); const payload = {};
+        payload.title = (editor.querySelector('.edit-title').value||'').trim();
+        payload.bucket = editor.querySelector('.edit-bucket').value;
+        payload.status = editor.querySelector('.edit-status').value;
+        const dueVal = editor.querySelector('.edit-due').value; payload.due = dueVal? dueVal : null;
+        payload.progress = parseInt(editor.querySelector('.edit-progress').value||0,10);
+        payload.blocker = editor.querySelector('.edit-blocker').value || null;
+        payload.notes = editor.querySelector('.edit-notes').value || null;
+        try{ await updateTask(saveBtn.dataset.id, payload); editor.style.display='none'; await render(); } catch(e){ alert('Save failed: '+(e.message||e)); }
+    }); }
     list.appendChild(el);
   }
 }
