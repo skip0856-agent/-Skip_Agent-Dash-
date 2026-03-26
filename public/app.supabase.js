@@ -75,12 +75,12 @@ async function render(){ const tasks = await fetchTasks(); console.log('render: 
             <input class="edit-blocker" placeholder="Blocker" value="${escapeHtml(t.blocker||'')}" style="flex:1;padding:6px;border-radius:6px;border:1px solid #e6eef6">
           </div>
           <div style="margin-top:8px"><textarea class="edit-notes" rows=3 style="width:100%;padding:6px;border-radius:6px;border:1px solid #e6eef6">${escapeHtml(t.notes||'')}</textarea></div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="action-btn save" data-id="${t.id}">Save</button><button class="action-btn cancel">Cancel</button></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="action-btn save" data-id="${t.id}">Save</button><button class="action-btn cancel">Cancel</button><button class="action-btn primary done-inline" data-id="${t.id}">Done</button></div>
         </div>
       </div>
       <div style="margin-left:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <div class="card-actions"><button class="action-btn" data-action="note" data-id="${t.id}">Edit</button> <button class="action-btn" data-action="move" data-id="${t.id}">Move</button></div>
-        <button class="action-btn primary" data-action="done" data-id="${t.id}">Done</button>
+        <div class="card-actions"><button class="action-btn" data-action="note" data-id="${t.id}">Edit</button></div>
+        ${ t.project ? `<button class="action-btn" data-action="open-project" data-project="${escapeHtml(t.project)}">Project</button>` : '' }
       </div>`;
     // Attach direct handlers so clicks reliably fire
     const doneBtn = el.querySelector('[data-action="done"]');
@@ -88,11 +88,12 @@ async function render(){ const tasks = await fetchTasks(); console.log('render: 
     const moveBtn = el.querySelector('[data-action="move"]');
     if(doneBtn){ doneBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); await updateTask(doneBtn.dataset.id,{status:'Completed',progress:100}); render(); }); }
     if(noteBtn){ noteBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); const editor = el.querySelector('.inline-editor'); if(!editor) return; editor.style.display='block'; const ta = editor.querySelector('.edit-notes'); ta.focus(); }); }
-    if(moveBtn){ moveBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); const editor = el.querySelector('.inline-editor'); if(!editor) return; editor.style.display='block'; const st = editor.querySelector('.edit-status'); st.focus(); }); }
-    // editor buttons (save/cancel)
+    // editor buttons (save/cancel/done inline)
     const saveBtn = el.querySelector('.inline-editor .save');
     const cancelBtn = el.querySelector('.inline-editor .cancel');
+    const doneInlineBtn = el.querySelector('.inline-editor .done-inline');
     if(cancelBtn){ cancelBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); const editor = el.querySelector('.inline-editor'); if(editor) editor.style.display='none'; }); }
+    if(doneInlineBtn){ doneInlineBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); try{ await updateTask(doneInlineBtn.dataset.id,{status:'Completed',progress:100}); const editor = el.querySelector('.inline-editor'); if(editor) editor.style.display='none'; await render(); } catch(e){ alert('Failed to mark done: '+(e.message||e)); } }); }
     if(saveBtn){ saveBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const editor = el.querySelector('.inline-editor'); const payload = {};
         payload.title = (editor.querySelector('.edit-title').value||'').trim();
         payload.bucket = editor.querySelector('.edit-bucket').value;
