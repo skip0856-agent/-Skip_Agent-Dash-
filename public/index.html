@@ -18,6 +18,11 @@ h1{font-size:20px;margin:0}
 .card{background:var(--card);border-radius:12px;padding:12px;border:1px solid rgba(11,37,69,0.06);box-shadow:0 6px 18px rgba(11,37,69,0.04)}
 .task-card{background:var(--card);border-radius:10px;padding:14px;border:1px solid #eef8fb;box-shadow:0 6px 18px rgba(11,37,69,0.04);display:flex;justify-content:space-between;align-items:flex-start}
 .chip{background:var(--surface);color:var(--text);padding:6px 10px;border-radius:999px;font-size:12px}
+/* sticky header */
+.sticky-header{position:sticky;top:0;background:linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.8));backdrop-filter:blur(6px);padding:10px;border-radius:8px;box-shadow:0 6px 18px rgba(11,37,69,0.04);z-index:40}
+/* sticky actions (mobile) */
+#stickyActions{display:none}
+
 /* dark theme */
 .dark{--bg:#0b1220;--card:#0e1624;--muted:#9aa7b2;--text:#dbeafe;--accent:#60a5fa;--surface:#11202b}
 </style>
@@ -43,7 +48,7 @@ h1{font-size:20px;margin:0}
 </head>
 <body>
 <div class="container">
-  <div class="toprow">
+  <div class="toprow sticky-header">
     <div>
       <h1>Skip Dashboard</h1>
     </div>
@@ -84,6 +89,12 @@ h1{font-size:20px;margin:0}
 (function(){ const btn=document.getElementById('themeToggle'); const root=document.documentElement; const stored=localStorage.getItem('theme'); if(stored==='dark'){ root.classList.add('dark'); btn.textContent='Light'; }
  btn.addEventListener('click', ()=>{ if(root.classList.toggle('dark')){ btn.textContent='Light'; localStorage.setItem('theme','dark')} else { btn.textContent='Dark'; localStorage.setItem('theme','light') } });})();
 </script>
+  <!-- Mobile sticky actions (visible on small screens) -->
+  <div id="stickyActions" style="display:none;position:fixed;left:12px;right:12px;bottom:72px;display:flex;gap:8px;justify-content:space-between;padding:8px;z-index:50">
+    <button id="mobileNew" class="btn">+ New</button>
+    <button id="mobileMC" class="btn ghost">Mission</button>
+    <button id="mobileBuckets" class="btn ghost">Buckets</button>
+  </div>
 </div>
 <script src="/app.supabase.js"></script>
 </body>
