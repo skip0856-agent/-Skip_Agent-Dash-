@@ -161,6 +161,10 @@ async function updateTask(id, patch){ patch.updated_at = new Date().toISOString(
 function wireActions(){ document.getElementById('addTop').addEventListener('click', ()=>{
   const title = prompt('Task title'); if(!title) return; addTask({title,bucket:'Work',status:'Not Started',progress:0}).then(()=>render());
 });
+// mobile sticky actions
+const mobileNew = document.getElementById('mobileNew'); if(mobileNew){ mobileNew.addEventListener('click', ()=>{ document.getElementById('addTop').click(); }); }
+const mobileMC = document.getElementById('mobileMC'); if(mobileMC){ mobileMC.addEventListener('click', ()=>{ const rp=document.getElementById('rightPanel'); if(rp){ rp.scrollIntoView({behavior:'smooth'}); } }); }
+const mobileBuckets = document.getElementById('mobileBuckets'); if(mobileBuckets){ mobileBuckets.addEventListener('click', ()=>{ const bb=document.getElementById('bottomBuckets'); if(bb){ bb.style.display = (bb.style.display==='flex') ? 'none' : 'flex'; } }); }
  document.getElementById('taskList').addEventListener('click', async (ev)=>{
    const btn = ev.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
    if(action === 'done'){
