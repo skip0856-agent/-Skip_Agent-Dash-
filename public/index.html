@@ -21,6 +21,17 @@ h1{font-size:20px;margin:0}
 /* dark theme */
 .dark{--bg:#0b1220;--card:#0e1624;--muted:#9aa7b2;--text:#dbeafe;--accent:#60a5fa;--surface:#11202b}
 </style>
+<style>
+/* Responsive: stack columns on small screens */
+@media (max-width: 900px){
+  .three-col{grid-template-columns:1fr !important}
+  #leftSidebar, #rightPanel{display:none}
+  #bottomBuckets{display:flex;position:fixed;left:10px;right:10px;bottom:12px;gap:8px;justify-content:space-between;padding:8px;background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);border-radius:12px}
+  #taskList .task-card{padding:18px}
+}
+/* bottom buckets default hidden on desktop */
+#bottomBuckets{display:none}
+</style>
 <!-- Supabase JS (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -66,6 +77,9 @@ h1{font-size:20px;margin:0}
       </aside>
     </div>
   </div>
+
+  <!-- Mobile bottom bucket bar (visible only on small screens) -->
+  <div id="bottomBuckets"></div>
 
 <script>
 // theme toggle
