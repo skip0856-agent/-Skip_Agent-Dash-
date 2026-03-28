@@ -102,12 +102,12 @@ async function render(){ const tasks = await fetchTasks(); console.log('render: 
             <input class="edit-blocker" placeholder="Blocker" value="${escapeHtml(t.blocker||'')}" style="flex:1;padding:6px;border-radius:6px;border:1px solid #e6eef6">
           </div>
           <div style="margin-top:8px"><textarea class="edit-notes" rows=3 style="width:100%;padding:6px;border-radius:6px;border:1px solid #e6eef6">${escapeHtml(t.notes||'')}</textarea></div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="action-btn save" data-id="${t.id}">Save</button><button class="action-btn cancel">Cancel</button><button class="action-btn primary done-inline" data-id="${t.id}">Done</button></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn ghost save" data-id="${t.id}">💾 Save</button><button class="btn ghost cancel">✖ Cancel</button><button class="btn done-inline" data-id="${t.id}">✅ Done</button></div>
         </div>
       </div>
       <div style="margin-left:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <div class="card-actions"><button class="action-btn" data-action="note" data-id="${t.id}">Edit</button></div>
-        ${ t.project ? `<button class="action-btn" data-action="open-project" data-project="${escapeHtml(t.project)}">Project</button>` : '' }
+        <div class="card-actions"><button class="btn ghost" data-action="note" data-id="${t.id}">✎ Edit</button></div>
+        ${ t.project ? `<button class="btn ghost" data-action="open-project" data-project="${escapeHtml(t.project)}">📁 Project</button>` : '' }
       </div>`;
     // Attach direct handlers so clicks reliably fire
     const doneBtn = el.querySelector('[data-action="done"]');
@@ -147,7 +147,7 @@ async function render(){ const tasks = await fetchTasks(); console.log('render: 
           ${ shortNotes ? `<div style="margin-top:8px;color:var(--muted);font-size:13px">${shortNotes}</div>` : '' }
         </div>
         <div style="margin-left:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-          <button class="action-btn" data-action="move" data-id="${t.id}">Move</button>
+          <button class="btn ghost" data-action="move" data-id="${t.id}">↔ Move</button>
         </div>`;
       const moveBtn = el.querySelector('[data-action="move"]'); if(moveBtn){ moveBtn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const newStatus = prompt('Change status', 'Active'); if(newStatus) { await updateTask(newStatus); render(); } }); }
       list.appendChild(el);
