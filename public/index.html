@@ -13,8 +13,11 @@ body{font-family:Inter,Segoe UI,Arial;background:var(--bg);color:var(--text);mar
 h1{font-size:20px;margin:0}
 .small-muted{color:var(--muted)}
 .header-actions{display:flex;gap:8px}
-.btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-.btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(11,37,69,0.06)}
+.btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(9,30,66,0.08);transition:transform .12s ease,box-shadow .12s ease,background-color .12s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(9,30,66,0.12)}
+.btn:active{transform:translateY(0);box-shadow:0 6px 18px rgba(9,30,66,0.06)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(11,37,69,0.06);box-shadow:none}
+.btn.ghost:hover{background:rgba(11,37,69,0.03)}
 .card{background:var(--card);border-radius:12px;padding:12px;border:1px solid rgba(11,37,69,0.06);box-shadow:0 6px 18px rgba(11,37,69,0.04)}
 .task-card{background:var(--card);border-radius:10px;padding:14px;border:1px solid #eef8fb;box-shadow:0 6px 18px rgba(11,37,69,0.04);display:flex;justify-content:space-between;align-items:flex-start}
 .chip{background:var(--surface);color:var(--text);padding:6px 10px;border-radius:999px;font-size:12px}
